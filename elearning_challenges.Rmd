@@ -1,0 +1,263 @@
+---
+title: "5026_FinalProject"
+author: "Xiaoying Lin"
+date: "2022-12-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction & Literature Review
+
+Online E-learning refers to the learning experiences that utilize electronic devices under synchronous or asynchronous conditions (Zalat et al., 2021). Online learning has become a significant part of education across the world (Singh & Thurman, 2019). During the COVID-19 pandemic, schools and colleges were forced to close temporarily and had to adopt E-learning for education (Zalat et al., 2021). As E-learning becomes more and more dominant in Education field, it is important to investigate users' experiences about E-learning and continually improves and updates E-learning accordingly.
+
+There are some general advantages of E-learning. For example, Studies found that a majority of university staff claimed that online learning enables them to adjust course progress at their own speed and that technologies involved in online-learning enhance their teaching experiences (Zalat et al., 2021). In addition, the majority of university staff perceived online E-learning as useful and easy to use (Zalat et al., 2021). However, not everyone accepts the use of online E-learning in education and there are some major barriers that many university staff encounter, such as unstable internet connectivity, lack of computers, technical issues, and so on (Zalat et al., 2021). 
+
+Studies have identified some critical success factors of E-learning, including computer training, computer self-efficacy, attitude, and perceived usefulness of E-learning (Xaymoungkhoun et al., 2012). In addition, years of teaching experiences, age of staff, gender, work section are also important factors that affect acceptance of E-learning (Zalat et al., 2021). 
+
+Although E-learning has been frequently used in education nowadays, it's still important to identify key challenges that teachers face in order to decrease such challenges to enhance E-learning experiences. In addition, to increase the acceptance rate of university staff to a higher degree, we need to further explore and validate the factors that are associated with acceptance of E-learning.
+
+Current study's research questions are: 1) What are some key challenges that university staff face when adopting E-learning? 2) What are some socio-demographic and occupational factors that affect University staff's acceptance of E-learning?
+
+## Methods & Sample
+
+```{r import}
+# Import data file
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+Edata <- read_csv("/Users/stephanielin/Desktop/HUDM 5026 - R/ELearning.csv")
+Edata_S <- Edata %>% select(2,3,4,7,8,9,36:58)
+```
+```{r clean}
+Edata_S$Gender[Edata_S$Gender == 1] <- "Male"
+Edata_S$Gender[Edata_S$Gender == 2] <- "Female"
+Edata_S$HaveyoutaughtanonlinecoursebeforeCovid19[Edata_S$HaveyoutaughtanonlinecoursebeforeCovid19==0] <- "No"
+Edata_S$HaveyoutaughtanonlinecoursebeforeCovid19[Edata_S$HaveyoutaughtanonlinecoursebeforeCovid19==1] <- "Yes"
+Edata_S$Haveyouhighinternetspeedathome[Edata_S$Haveyouhighinternetspeedathome==0] <- "No"
+Edata_S$Haveyouhighinternetspeedathome[Edata_S$Haveyouhighinternetspeedathome==1] <- "Yes"
+Edata_S$acceptance <- rowMeans(select(Edata_S,7:10))
+```
+
+##### Sample
+
+The data was collected from electronic questionnaires finished by medical staff at the Faculty of Medicine, Zagazig University, Egypt. The sample size is 346 staff memebers. 
+
+Table 1 shows descriptive information of demographic and occupational factors of sample. It shows the frequencies and percentages of of sample's gender, residence (live in work place city or not), marital status, have high internet speed at home or not, have taught online course before Covid19 or not.
+
+Table 2 shows descriptive statistics of continuous variables used in this study. It shows the mean, standard deviation, and range (minimum, maximum) of each continuous variable. Among these variables, Y1, Y2, Y3, and Y4 represents liker scale from 1 (strongly disagree) to 5 (strongly agree) measurements of real use of E-learning, frequency of use, satisfaction of E-learning, and recommendation of E-learning to others. The acceptance variable represents the average acceptance of E-learning, which will be clarified later. YearsofCollegeTeachingExperience variable represents the years of staff teaching. The remaining 19 variables are barriers and challenges faced when using E-learning that staff ranked in order of seriousness from 1 (least serious) to 10 (most serious). The desciptions of barriers and challenges are:
+
+1. InsufficientunstableInternetconnectivity: Insufficient/ unstable Internet connectivity
+2. longertimetoprepareforanonlinecourse: longer time to prepare for an online course
+3. Limitedtechnologyskillsofthestaff: Limited technology skills of the staff
+4. InadequatetimeandShorttrainingperiodonelearning: Inadequate time and Short training period on e-learning
+5. Lackofprotectiononthedevelopedematerials: Lack of protection on the developed e-materials
+6. Lackofcomputerslaptops: Lack of computers/ laptops
+7. Inadequatecomputerlabs: Inadequate computer labs
+8. Technicalproblems: Technical problems
+9. lackofsuitableonlineenvironmentathomee.g.presenceofchildrenother: lack of suitable online environment at home (e.g. presence of children, other family members)
+10. LackofincentivesNoncompensationforInternetoutsidetheuniversity: Lack of incentives/ Non-compensation for Internet outside the university
+11. Staffresistanceandnegativeattitudetowardselearning: Staff resistance and negative attitude towards e-learning
+12. Shortageofteachingstaff: Shortage of teaching staff
+13. Heavyworkloadoftheonlinecourses: Heavy workload of the online courses
+14. levelofinteractionswithstudentsintheonlinecourseislowerthaninatr: level of interactions with students in the online course is lower than in a traditional face-to-face class
+15. Difficultyformotivatingthestudentsintheonlineenvironmentthaninth: Difficulty for motivating the students in the online environment than in the traditional setting
+16. InadequatetimetoattendtothelargenumberofstudentsontheInternet: Inadequate time to attend to the large number of students on the Internet
+17. Difficultapplyingdistancelearningforpracticalsessionsandcourses: Difficult applying distance learning for practical sessions and courses
+18. Difficultdividingstudentsintosubgroupsforgrouptaskworking: Difficult dividing students into subgroups for group task working
+19. Difficultreceivingstudentfeedbackintheonlinecoursethaninatraditi: Difficult receiving student feedback in the online course than in a traditional face-to-face class
+
+```{r desciptive}
+library(gtsummary)
+library(psych)
+# categorical variables
+Edata_Categorical <- Edata_S %>% select(1,2,3,5,6)
+Edata_Categorical %>% 
+  as_tibble() %>% 
+  tbl_summary(type = c(HaveyoutaughtanonlinecoursebeforeCovid19,Haveyouhighinternetspeedathome) ~ "categorical") %>% 
+  modify_caption("**Table 1. Staff Characteristics**") %>% 
+  bold_labels()
+# continuous variables
+Edata_Continuous <- Edata_S %>% select(-c(1,2,3,5,6))
+Edata_Continuous %>% as_tibble() %>% tbl_summary(
+    statistic = all_continuous() ~ c("{mean}","{sd}", "{min}, {max}"),
+    missing = "no",
+    type = list(where(is.numeric) ~ "continuous2")
+  ) %>% 
+  modify_caption("**Table 2. Continuous Variables Statistics**") %>%
+  bold_labels()
+```
+
+
+
+```{r }
+gender <- ggplot(data=Edata_S, mapping=aes(x=Gender)) +
+  geom_bar(fill="steelblue") +
+  xlab("Gender") +
+  ggtitle("Sample Distribution")
+Residence <- ggplot(data=Edata_S, mapping=aes(x=Residence)) +
+  geom_bar(fill="steelblue") +
+  xlab("Residence") +
+  scale_x_discrete(labels = c('city away','same city')) +
+  ggtitle("Sample Distribution")
+Maritalstatus <- ggplot(data=Edata_S, mapping=aes(x=Maritalstatus)) +
+  geom_bar(fill="steelblue") +
+  xlab("Maritalstatus") +
+  ggtitle("Sample Distribution")
+Internet <- ggplot(data=Edata_S, mapping=aes(x=Haveyouhighinternetspeedathome)) +
+  geom_bar(fill="steelblue") +
+  xlab("High Internet Speed") +
+  ggtitle("Sample Distribution")
+Onlinecourse <- ggplot(data=Edata_S, mapping=aes(x=HaveyoutaughtanonlinecoursebeforeCovid19)) +
+  geom_bar(fill="steelblue") +
+  xlab("Taught Online course") +
+  ggtitle("Sample Distribution")
+library(gridExtra)
+grid.arrange(gender, Residence, Maritalstatus, Internet,Onlinecourse, ncol=3, nrow =2)
+```
+
+Based on the bar plots above and Table 1, we can see that there is a highly disproportionate distribution of males (12%) and females (88%) in the sample. A majority of the subjects live in the same city of work space (76%). A majority of subjects are married (72%) and the remaining is single (24%) or widowed (4%). Most of the subjects have high internet speed at home (92%). 60% of the subjects haven't taught online course before Covid19 while 40% of the sample have.
+
+Based on Table 2, we can see that the sample has an average of 20 years of college teaching experience (SD = 10). The highest years of teaching is 40 years while the lowest is 4 years. Overall, the sample has an average of 4.04 acceptance rate of E-learning (SD = 0.64). 
+
+##### Method
+
+To identify the most serious challenges that university staff face, I calculated mean rating of each challenge variable across subjects. The average rating of each challenge variable represents the overall seriousness rated by subjects. Challenge with higher average rating is considered to be more serious. 
+
+To measure the overall acceptance of E-learning, I computed the average of Y1, Y2, Y3, and Y4 variables, which measure different aspects of acceptance of E-learning. The overall acceptance is represented by the acceptance variable. 
+
+There's no missing value in the selected variables. However, I recoded some categorical variables by changing the number levels into string levels. For example, in the original Gender variable, 1 represents male and 2 represents female. It is hard for readers to get what 1 and 2 mean in graphs. As a result, I change all 1 into male and 2 into female for Gender variable.
+
+To explore the relationship between socio-demographic and occupational factors and the acceptance of E-learning, I firstly used different methods for categorical and continuous variables. For categorical variables (Gender, Residence, Maritalstatus, Haveyouhighinternetspeedathome, HaveyoutaughtanonlinecoursebeforeCovid19), I displayed a table of mean and standard deviation of acceptance for each level so that the group difference is clear to see. In addition, I displayed a boxplot for each categorical variable. The boxplot provides a summary of the first, second, and third quartiles, the minimum, the maximum and outliers. The minimum and the maximum are found at the end of the whisker, the solid line. The lower boarder of the box represents the first quartile (Q1), the middle thick line represents the second quartile (Q2), and the upper boarder of the box represents the third quartile (Q3). An outlier is data point that is significantly distant from the rest of the data and is located outside the whiskers of the box plot. An outlier can also be found numerically, 1.5 times the interquartile range (Q3-Q1) above the upper quartile and below the lower quartile. 
+
+For the countinuous variable, yearsofCollegeTeachingExperience, I display a scatter plot to visualize the relationship between it and acceptance of E-learning. The line in the scatter plot shows the general relationship trend. I also calculated the correlation coefficient between yearsofCollegeTeachingExperience and acceptance. The correlation coefficient shows the strength and direction of the linear relationship between two variables. The value of r ranges between −1 and 1. 
+
+Lastly, I used multiple linear regression model to statistically examine the relationship between all socio-demographic and occupational factors (IVs) and acceptance of E-learning (DV). The multiple linear regression model allows us to capture the relationship between a specific explanatory variable and the outcome variable when controlling for other variables. In other words, multiple regression analysis allows us to evaluate the strength of the relationship between each explanatory variable and outcome variable while eliminating the influence of other explanatory variables. In the model, the intercept is the predicted outcome value for a unit with a score of 0 on all the predictor variables. The slope is the change in the predicted value of the outcome associated with a one unit increase in the predictor while holding constant the values of the other predictors in the model. The regression analysis is significant at 5% error margin (0.05 alpha level of significance). The p-value for each term tests the null hypothesis that the coefficient is equal to zero. A low p-value (< 0.05) indicates that we can reject the null hypothesis, meaning there's a significant relationship between the independent variable and dependent variable. 
+
+I also checked whether the multiple linear regression model satisfies the assumptions for statistical inference: linearity (the dependent variable is a linear combination of the independent variables and residuals), constant variance (the error has a constant variance for all values of independent variable), normality (error term is normally distributed), and independence (the errors for each unit are assumed to be independent). I also calculated Variance inflation factors to detect if there's any collinearity issue. If value of VIF is greater than 10, there may exist a severe problem of multicollinearity.  
+
+## Findings
+
+```{r difficulty}
+difficulty <- Edata_S[,11:29]
+difficulty_average <- apply(difficulty,2,FUN=mean)
+sort(difficulty_average)
+```
+
+The sorted average rating of each challenge is listed above. We can see that the top five challenges that university staff rated are: difficult applying distance learning for practical sessions and courses, technical problems, insufficient unstable internet connectivity, lack of suitable online environment at home, and lack of incentives and compensation for Internet outside the university.
+
+```{r}
+ggplot(data=Edata_S, mapping=aes(x=as.factor(Gender),y=acceptance)) +
+  geom_boxplot(width=.18) +
+  xlab("Gender") +
+  ylab("Acceptance of E-Learning") +
+  ggtitle("Figure 1")
+
+Edata_S %>%
+  group_by(Gender) %>%
+  summarise(mean = mean(acceptance), sd = sd(acceptance))
+```
+According to the boxplot, we can see that male and female group have same median acceptance of E-leaning. However, for female group, the data is more dispersed than male group, agreeing with the standard deviation values in table. This is probably because there were more female in the sample. The group means in table are also similar, meaning that male and female groups have similar average acceptance of E-learning. However, there's an outlier in female group. This outlier negatively affects the average acceptance of E-learning for female group. 
+
+```{r}
+ggplot(data=Edata_S, mapping=aes(x=as.factor(Residence),y=acceptance)) +
+  geom_boxplot(width=.18) +
+  xlab("Residence") +
+  ylab("Acceptance of E-Learning") +
+  ggtitle("Figure 2")
+
+Edata_S %>%
+  group_by(Residence) %>%
+  summarise(mean = mean(acceptance), sd = sd(acceptance))
+```
+According to the boxplot, we can see that staff who lived in city away from the work place and staff who lived in the same city of the work place have same median acceptance of E-leaning. However, for same city group, the data is more dispersed than city away from the work place group, agreeing with the standard deviation values in table. The group means in table are also similar, meaning that both groups have similar average acceptance of E-learning. However, there's an outlier in same city group. This outlier negatively affects the average acceptance of E-learning for same city group. 
+
+```{r}
+ggplot(data=Edata_S, mapping=aes(x=as.factor(Maritalstatus),y=acceptance)) +
+  geom_boxplot(width=.18) +
+  xlab("Maritalstatus") +
+  ylab("Acceptance of E-Learning") +
+  ggtitle("Figure 3")
+
+Edata_S %>%
+  group_by(Maritalstatus) %>%
+  summarise(mean = mean(acceptance), sd = sd(acceptance))
+```
+According to the boxplot, we can see that single staff has the highest acceptance median, followed by married staff. The single group has the most dispersed data while the widowed has no variance in acceptance of E-learning. This is probably because there were only 14 widowed staff (4%) in the sample. There are some differences in group means. Single staff have the highest average acceptance of E-learning, followed by married staff. However, there's an outlier in married group. This outlier negatively affects the average acceptance of E-learning for married group. 
+
+```{r}
+ggplot(data=Edata_S, mapping=aes(x=as.factor(Haveyouhighinternetspeedathome),y=acceptance)) +
+  geom_boxplot(width=.18) +
+  xlab("Have high internet speed at home") +
+  ylab("Acceptance of E-Learning") +
+  ggtitle("Figure 4")
+
+Edata_S %>%
+  group_by(Haveyouhighinternetspeedathome) %>%
+  summarise(mean = mean(acceptance), sd = sd(acceptance))
+```
+According to the boxplot, we can see that staff who had high internet speed at home had higher acceptance of E-learning compared to staff who didn't. In addition, the acceptance rating variance is more dispersed for staff who had high internet speed. This is probably because there were more staff who have high internet speed at home (92%) in the sample. In addition, according to the table, in average, staff who had high internet speed at home accepted E-learning more. However, there's an outlier in have high internet speed group. This outlier negatively affects the average acceptance of E-learning for have high internet speed group. 
+
+
+```{r}
+ggplot(data=Edata_S, mapping=aes(x=as.factor(HaveyoutaughtanonlinecoursebeforeCovid19),y=acceptance)) +
+  geom_boxplot(width=.18) +
+  xlab("Have taught an online course before Covid19") +
+  ylab("Acceptance of E-Learning") +
+  ggtitle("Figure 5")
+
+Edata_S %>%
+  group_by(HaveyoutaughtanonlinecoursebeforeCovid19) %>%
+  summarise(mean = mean(acceptance), sd = sd(acceptance))
+```
+According to the boxplot, we can see that staff who had taught an online course before Covid19 had in general higher acceptance of E-learning compared to staff who didn't. Rating of acceptance is more dispersed for group who have taught online course before. However, according to the table, in average, two groups have almost the same acceptance of E-learning. This is probably because there is an outlier in Yes group and significantly affects the average acceptance rate for Yes group. 
+
+```{r}
+ggplot(data=Edata_S, mapping=aes(x=YearsofCollegeTeachingExperience, y=acceptance)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y ~ x, se=FALSE, 
+              color="steelblue", linetype=2) +
+  xlab("Years of College Teaching Experience") +
+  ylab("Acceptance of E-Learning") +
+  ggtitle("Figure 6")
+
+cor(Edata_S$acceptance, Edata_S$YearsofCollegeTeachingExperience)
+```
+According to the scatter plot, we can see that there's a positive relationship between years of college teaching experience and acceptance of E-learning. In average, staff with more years of teaching experience is more likely to accept E-learning. The correlation coefficient (r = .34) also shows that there's a weak to moderate positive linear relationship. It agrees with the scatterplot since there are some distances between where the data points fall and the blue line, which indicates a weak to moderate linear relationship. The blue line also has a positive slope, indicating a positive relationship. 
+
+```{r}
+reg <- lm(acceptance ~ YearsofCollegeTeachingExperience + Gender + Residence + Maritalstatus + Haveyouhighinternetspeedathome + HaveyoutaughtanonlinecoursebeforeCovid19 ,data = Edata_S)
+summary(reg)
+```
+The multiple regression analysis shows that there's a significant relationship between years of college teaching experience and acceptance of E-learning (p < .001). For every one year increase in years of college teaching experience, the acceptance rating of E-learning increases by 0.038 while holding all other independent variables constant. There's also a significant difference in acceptance of E-learning between male and female staff (p < .001). Male staff have .556 higher acceptance of E-learning compared to female group while holding all other independent variables constant. There's also a significant difference in acceptance of E-learning between single and married staff (p < .001). Single staff have .511 higher acceptance of E-learning compared to married group while holding all other independent variables constant. There's also a significant difference in acceptance of E-learning between widowed and married staff (p = .0045). Widowed staff have .433 lower acceptance of E-learning compared to married group while holding all other independent variables constant. There's also a significant difference in acceptance of E-learning between staff who have high internet speed at home and staff who don't (p < .001). Staff who have high internet speed at home have .564 higher acceptance of E-learning compared to staff who don't while holding all other independent variables constant. 
+
+However, there's no significant relationship between residence and acceptance of E-learning (p = .231). There's also no significant relationship between whether staff have taught an online course before Covid19 and acceptance of E-learning (p = .559).
+
+```{r}
+par(mfrow = c(2, 2))
+plot(reg)
+library(car)
+vif(reg)
+```
+
+Based on the diagnostic plots shown above, I checked whether the multiple regression model follows assumptions. The Residuals vs Fitted plot shows that linear relationship assumption seems to hold reasonably. The red line is close to the dashed line. The Normal Q-Q shows that the normality assumption is violated. Some residuals points don't follow the straight dashed line. The Scale-Location shows that we have a small heteroscedasticity problem. The red line is not horizontal with unequally spread points. The Residuals vs Leverage plot can identify extreme values that might influence the regression results when included. There are some potential influential outliers at the bottom of the plot. Since the data was collected from one university once, independence assumption is satisfied. There's no collinearity issue since all GVIF values are pretty small. 
+
+## Discussion
+
+In conclusion, the key challenges that university staff faced when using E-learning are difficult applying distance learning for practical sessions and courses, technical problems, insufficient unstable internet connectivity, lack of suitable online environment at home, and lack of incentives and compensation for Internet outside the university. According to multiple regression analysis, factors that can significantly affect university staff's acceptance of E-learning are gender, marital status, whether there's a high speed internet at home, and years of college teaching experience. 
+
+Related the findings to literature review, gender and years of teaching experiences are found to be significantly related to acceptance of E-learning in current and previous studies. Major barriers that university staff face found by current and previous studies are unstable internet connectivity and technical problems. 
+
+Since E-learning has gradually become a dominant section of education worldwide, it is important to address the key barriers and challenges that users face to make E-learning easier and to enhance using efficiency. E-learning developers and university can prioritize the most serious barriers that staff face and solve the remaining challenges gradually. E-learning offers many advantages such as flexible time and location. As a result, we need to encourage more university staff to accept E-learning so that they can utilize E-learning tools to diverse students' learning options and to enhance students' learning experiences. E-learning can also facilitate university staff's teaching. Current study has identified several factors that affect the acceptance of E-learning. By understanding these factors and significant variables found by other studies, educational institutions can figure out efficient ways to enhance staff's acceptance of E-learning.
+
+However, current study has some limitations. First of all, the sample size only includes 346 staff from only one university in Egypt. The results cannot be generalized to all university staff population around the world. Future studies can collect more diverse sample. Secondly, considering potential socio-demographic and occupational factors related to acceptance of E-learning, current study investigated only six factors. Future studies can incorporate more associated factors such as age, income level, teaching subjects, and so on. Thirdly, since the multiple regression model in this study doesn't satisfy homoscedasticity and normality assumptions, the accuracy of regression analysis results may be weakened. Future studies can transform certain variables or use more valid measurements to address the assumption issues.
+
+## Reference
+
+Singh, & Thurman, A. (2019). How Many Ways Can We Define Online Learning? A Systematic Literature Review of Definitions of Online Learning (1988-2018). The American Journal of Distance Education, 33(4), 289–306. https://doi.org/10.1080/08923647.2019.1663082
+
+Xaymoungkhoun, O., Bhuasiri, W., Rho, J. J., Zo, H., & Kim, M. G. (2012). The critical success factors of e-learning in developing countries. Kasetsart Journal of Social Sciences, 33(2), 321-332.
+
+Zalat, Hamed, M. S., & Bolbol, S. A. (2021). The experiences, challenges, and acceptance of e-learning as a tool for teaching during the COVID-19 pandemic among university medical staff. PloS One, 16(3), e0248758–e0248758. https://doi.org/10.1371/journal.pone.0248758
